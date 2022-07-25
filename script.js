@@ -2,8 +2,8 @@ let tareasTotal = document.querySelector("#tareasTotal");
 let tareasRealizadas = document.querySelector("#tareasRealizadas");
 let botonAgregar = document.querySelector("#botonAgregar");
 let listadoTareas = document.querySelector("#listadoTareas");
-let tareas = [{ id: 1658531872574, nombre: "leer" }, { id: 1658531872575, nombre: "escribir" }, { id: 1658531872576, nombre: "hacer ejercicio" }];
-let conteoRealizadas = 0;
+let tareas = [{ id: 1658531872574, nombre: "leer", realizado: false }, { id: 1658531872575, nombre: "escribir", realizado: false }, { id: 1658531872576, nombre: "hacer ejercicio", realizado: false }];
+
 refrescar();
 
 function borrar(id) {
@@ -11,42 +11,48 @@ function borrar(id) {
     tareas.splice(index, 1);
     refrescar();
 }
-//debo revisar esto para luego
-function check(x) {
-    if (x.checked == true) {
-        conteoRealizadas++;
-        x.parentNode.style.backgroundColor = "#82E0AA";
 
+function check(x) {
+    let check = document.getElementById(x);
+    const index = tareas.findIndex((ele) => ele.id == x);
+    if (check.checked == true) {
+        document.getElementById(`nombre${x}`).style.backgroundColor = "#82E0AA";
+        tareas[index].realizado = true;
     }
     else {
-        conteoRealizadas--;
-        x.parentNode.style.backgroundColor = "";
-
+        document.getElementById(`nombre${x}`).style.backgroundColor = "";
+        tareas[index].realizado = false;
     }
-    tareasRealizadas.innerHTML = `Realizadas: ${conteoRealizadas}`;
+    tareasRealizadas.innerHTML = `Realizadas: ${tareas.filter(x => x.realizado == true).length}`;
+
 }
 
 
 
 botonAgregar.addEventListener("click", function () {
     let inputTarea = document.querySelector("#inputTarea");
-    let nuevaTarea = {
-        id: Date.now(),
-        nombre: inputTarea.value
-    };
-    tareas.push(nuevaTarea);
-    refrescar();
+    if (inputTarea.value == "") {
+        alert("Ingrese una tarea por favor");
+    }
+    else {
+        let nuevaTarea = {
+            id: Date.now(),
+            nombre: inputTarea.value,
+            realizado: false
+        };
+        tareas.push(nuevaTarea);
+        refrescar();
+    }
 });
 
 function refrescar() {
     let html = "<tr><th>Id</th><th>Nombre</th><th>Realizada</th><th>Borrar</th></tr>";
     for (tarea of tareas) {
-        html += `<tr><td>${tarea.id}</td><td>${tarea.nombre}</td><td><input type="checkbox" onchange="check(this)"></input></td><td><button onclick="borrar(${tarea.id})">X</button></td></tr>`;
+        html += `<tr><td>${tarea.id}</td><td id="nombre${tarea.id}">${tarea.nombre}</td><td><input class="form-check-input" id="${tarea.id}" type="checkbox" onclick="check(${tarea.id})"></input></td><td><button class="btn btn-danger" onclick="borrar(${tarea.id})">X</button></td></tr>`;
     }
     listadoTareas.innerHTML = html;
     inputTarea.value = "";
     tareasTotal.innerHTML = `Total: ${tareas.length}`;
-    conteoRealizadas = 0;
-
+    tareasRealizadas.innerHTML = `Realizadas: ${tareas.filter(x => x.realizado == true).length}`;
 
 }
